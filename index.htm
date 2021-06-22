@@ -1,0 +1,994 @@
+﻿<html><head>
+<title>魔法傷害試算 20210622 版</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="icon" href="https://dydron.github.io/Magic_20171227/XG_icon.png" type="image/ico">
+</head>
+<body bgcolor="dddddd">
+<script>
+function Dydron(){
+	result = (magic.level.value > 10) ?
+	Math.floor( fundamental_damage() * mnd_ratio() * mnd_difference() + adm_damage() + additional_damage()) * 
+		 ( 1 + crystal_relation() ) *
+		 ( 1 + element_relation() + race_relation() + weapon_race()) *
+		 normal_or_pk() :
+	Math.floor( fundamental_damage() * mnd_ratio()) * 
+		 ( 1 + crystal_relation() ) *
+		 ( 1 + element_relation() + race_relation() + weapon_race()) *
+		 adm_relation() * mnd_difference() * normal_or_pk();
+//	result = (magic.water_1.value>magic.fire_2.value)?magic.fire_2.value:magic.water_1.value;
+//	result = crystal_relation();
+	magic.damage95.value = Math.floor(result * 0.95);
+	magic.damage96.value = Math.floor(result * 0.96);
+	magic.damage97.value = Math.floor(result * 0.97);
+	magic.damage98.value = Math.floor(result * 0.98);
+	magic.damage99.value = Math.floor(result * 0.99);
+	magic.damage100.value = Math.floor(result);
+//	magic.damage100.value = result;
+	magic.damage101.value = Math.floor(result * 1.01);
+	magic.damage102.value = Math.floor(result * 1.02);
+	magic.damage103.value = Math.floor(result * 1.03);
+	magic.damage104.value = Math.floor(result * 1.04);
+	magic.damage105.value = Math.floor(result * 1.05);
+
+//	magic.aaa.value = fundamental_damage();
+//	magic.bbb.value = mnd_ratio();
+//	magic.ccc.value = crystal_relation();
+//	magic.ddd.value = element_relation();
+//	magic.eee.value = race_relation();
+//	magic.fff.value = adm_relation();
+//	magic.ggg.value = mnd_difference();
+//	magic.hhh.value = normal_or_pk();
+//	magic.iii.value = weapon_race();
+//	magic.jjj.value = adm_damage();
+//	magic.kkk.value = additional_damage();
+}
+function fundamental_damage(){ // 單強超法各級威力基本值
+	switch (magic.type.value){
+	case "1":	// 單法
+		switch (magic.level.value){
+		case "1":	return 100;
+		case "2":	return 180;
+		case "3":	return 251;
+		case "4":	return 320;
+//		case "5":	return 388;
+		case "5":	return 345;
+		case "6":	return 380;
+		case "7":	return 455;
+//		case "6":	return 456;
+//		case "7":	return 524;
+		case "8":	return 601;
+		case "9":	return 682;
+		case "10":	return 762;	
+		case "11":	return 806;
+		case "12":	return 884;
+		case "13":	return 960;
+		case "14":	return 992;
+		case "15":	return 1066;
+		}
+	case "2":	// 強法
+		switch (magic.level.value){
+		case "1":	return  59;
+		case "2":	return 109;
+		case "3":	return 151;
+		case "4":	return 191;
+		case "5":	return 233;
+		case "6":	return 273;
+		case "7":	return 315;
+		case "8":	return 360;
+		case "9":	return 410;
+		case "10":	return 457;		
+		case "11":	return 506;
+		case "12":	return 555;
+		case "13":	return 606;
+		case "14":	return 656;
+		case "15":	return 704;
+		}
+	case "3":	// 超法
+		switch (magic.level.value){
+		case "1":	return  40;
+		case "2":	return  71;
+		case "3":	return 101;
+		case "4":	return 127;
+		case "5":	return 154;
+		case "6":	return 183;
+		case "7":	return 210;
+		case "8":	return 241;
+		case "9":	return 272;
+		case "10":	return 305;
+		case "11":	return 337;
+		case "12":	return 371;
+		case "13":	return 404;
+		case "14":	return 440;
+		case "15":	return 475;
+		}
+	case "4":	// 吸血
+		switch (magic.level.value){
+		case "1":	return  55;
+		case "2":	return 100;
+		case "3":	return 139;
+		case "4":	return 177;
+		case "5":	return 215;
+		case "6":	return 253;
+		case "7":	return 291;
+		case "8":	return 334;
+		case "9":	return 378;
+		case "10":	return 423;
+		case "11":	return 468;
+		case "12":	return 513;
+		case "13":	return 559;
+		case "14":	return 606;
+		case "15":	return 652;
+		}
+	}
+}
+function mnd_ratio(){
+	mnd_upper_bound = 103 + magic.level.value*20;
+	mnd_ratio_real = magic.mnd_1.value / mnd_upper_bound;
+	if (mnd_ratio_real >= 1)	return 1;
+	else if (magic.mnd_1.value <= 0) return 0;
+	else return mnd_ratio_real;
+}
+function crystal_relation(){	// 水晶屬性
+	slot=0;
+	sum_1=(magic.ground_1.value*1 + magic.water_1.value*1 + magic.fire_1.value*1 + magic.wind_1.value*1) * 10;
+	sum_2=(magic.ground_2.value*1 + magic.water_2.value*1 + magic.fire_2.value*1 + magic.wind_2.value*1) * 10;
+
+	slot_1 = magic.ground_1.value * magic.water_2.value;
+	slot_2 = magic.water_1.value * magic.fire_2.value;
+	slot_3 = magic.fire_1.value * magic.wind_2.value;
+	slot_4 = magic.wind_1.value * magic.ground_2.value;
+	
+	slot_5 = magic.ground_2.value * magic.water_1.value;
+	slot_6 = magic.water_2.value * magic.fire_1.value;
+	slot_7 = magic.fire_2.value * magic.wind_1.value;
+	slot_8 = magic.wind_2.value * magic.ground_1.value;
+		
+	slot = slot_1*1 + slot_2*1 + slot_3*1 + slot_4*1 - slot_5*1 - slot_6*1 - slot_7*1 - slot_8*1 + sum_1*1 - sum_2*1;
+	return slot*0.003;
+}
+function element_relation(){	// 法術屬性
+	section=0;
+	switch (magic.element.value){
+	case "1": // 地
+		section = section + magic.water_2.value;
+		section = section - magic.wind_2.value;
+		break;
+	case "2": // 水
+		section = section + magic.fire_2.value;
+		section = section - magic.ground_2.value;
+		break;
+	case "3": // 火
+		section = section + magic.wind_2.value;
+		section = section - magic.water_2.value;
+		break;
+	case "4": // 風
+		section = section + magic.ground_2.value;
+		section = section - magic.fire_2.value;
+		break;
+	}
+	section = section + 10 - ( magic.ground_2.value*1 + magic.water_2.value*1 + magic.fire_2.value*1 + magic.wind_2.value*1 );
+/*	if (magic.ground_2.value*1 + magic.water_2.value*1 + magic.fire_2.value*1 + magic.wind_2.value*1 <= 10){
+		section = section + 10 - ( magic.ground_2.value*1 + magic.water_2.value*1 + magic.fire_2.value*1 + magic.wind_2.value*1);
+	}
+*/
+	return section*0.035;
+}
+function race_relation(){	// 種族相剋循環
+		switch (magic.race_2.value){
+			case "1":	return 0.2;
+			case "4":	return 0.1;
+			case "7":	return -0.15;
+			case "2":	return -0.2;
+			case "10":	return -0.2;
+			case "11":	return -0.2;
+			case "12":	return -0.2;
+			default :	return 0;
+		}
+}
+function five_off_six_adv(input_value){ // 五捨六入
+	if (input_value-Math.floor(input_value)<= 0.5){
+		return Math.floor(input_value);
+	}
+	else{
+		return Math.round(input_value);
+	}
+}
+function adm_relation(){	// 十級魔法以下魔攻影響
+	switch (magic.level.value){
+		case "1":
+			if (magic.adm.value <= 10)
+				return 1;
+			else if (magic.adm.value <= 14)
+				return five_off_six_adv((magic.adm.value-10)*(40/(14-10)))*0.0125+1;
+			else 
+				return 1.5;
+		case "2":
+			if (magic.adm.value <= 40)
+				return 1;
+			else if (magic.adm.value <= 48)
+				return five_off_six_adv((magic.adm.value-40)*(40/(48-40)))*0.0125+1;
+			else 
+				return 1.5;
+		case "3":
+			if (magic.adm.value <= 70)
+				return 1;
+			else if (magic.adm.value <= 82)
+				return five_off_six_adv((magic.adm.value-70)*(40/(82-70)))*0.0125+1;
+			else 
+				return 1.5;
+		case "4":
+			if (magic.adm.value <= 100)
+				return 1;
+			else if (magic.adm.value <= 116)
+				return five_off_six_adv((magic.adm.value-100)*(40/(116-100)))*0.0125+1;
+			else 
+				return 1.5;
+		case "5":
+			if (magic.adm.value <= 130)
+				return 1;
+			else if (magic.adm.value <= 150)
+				return five_off_six_adv((magic.adm.value-130)*(40/(150-130)))*0.0125+1;
+			else 
+				return 1.5;
+		case "6":
+			if (magic.adm.value <= 160)
+				return 1;
+			else if (magic.adm.value <= 184)
+				return five_off_six_adv((magic.adm.value-160)*(40/(184-160)))*0.0125+1;
+			else 
+				return 1.5;
+		case "7":
+			if (magic.adm.value <= 190)
+				return 1;
+			else if (magic.adm.value <= 218)
+				return five_off_six_adv((magic.adm.value-190)*(40/(218-190)))*0.0125+1;
+			else 
+				return 1.5;
+		case "8":
+			if (magic.adm.value <= 220)
+				return 1;
+			else if (magic.adm.value <= 252)
+				return five_off_six_adv((magic.adm.value-220)*(40/(252-220)))*0.0125+1;
+			else 
+				return 1.5;
+		case "9":
+			if (magic.adm.value <= 250)
+				return 1;
+			else if (magic.adm.value <= 286)
+				return five_off_six_adv((magic.adm.value-250)*(40/(286-250)))*0.0125+1;
+			else 
+				return 1.5;
+		case "10":
+			if (magic.adm.value <= 280)
+				return 1;
+			else if (magic.adm.value <= 320)
+				return five_off_six_adv((magic.adm.value-280)*(40/(320-280)))*0.0125+1;
+			else 
+				return 1.5;
+	}
+	return 1.5;
+}
+function adm_damage(){ // 11級法術以上魔攻影響
+	switch (magic.level.value){
+		case "11":
+			switch (magic.type.value){
+			case "1": // 單法
+				return magic.adm.value * 1.1;
+			case "2": // 強法
+				return magic.adm.value * 0.9;
+			case "3": // 超法
+				return magic.adm.value * 0.7;
+			case "4": // 吸血
+				return magic.adm.value * 1.1;
+			}
+		case "12":
+			switch (magic.type.value){
+			case "1": // 單法
+				return magic.adm.value * 1.2;
+			case "2": // 強法
+				return magic.adm.value * 1;
+			case "3": // 超法
+				return magic.adm.value * 0.8;
+			case "4": // 吸血
+				return magic.adm.value * 1.2;
+			}
+		case "13":
+			switch (magic.type.value){
+			case "1": // 單法
+				return magic.adm.value * 1.3;
+			case "2": // 強法
+				return magic.adm.value * 1.1;
+			case "3": // 超法
+				return magic.adm.value * 0.9;
+			case "4": // 吸血
+				return magic.adm.value * 1.3;
+			}
+		case "14":
+			switch (magic.type.value){
+			case "1": // 單法
+				return magic.adm.value * 1.5;
+			case "2": // 強法
+				return magic.adm.value * 1.3;
+			case "3": // 超法
+				return magic.adm.value * 1.1;
+			case "4": // 吸血
+				return magic.adm.value * 1.5;
+			}
+		case "15":
+			switch (magic.type.value){
+			case "1": // 單法
+				return magic.adm.value * 1.7;
+			case "2": // 強法
+				return magic.adm.value * 1.5;
+			case "3": // 超法
+				return magic.adm.value * 1.3;
+			case "4": // 吸血
+				return magic.adm.value * 1.7;
+			}
+	}	
+	return 1;
+}
+function additional_damage() {	// 11級以上法術額外傷害增幅
+	switch (magic.level.value){
+		case "11": return 310;
+		case "12": return 340;
+		case "13": return 370;
+		case "14": return 400;
+		case "15": return 430;
+	}
+	return 0;
+}
+function mnd_difference(){	// 施法方與受法方精神比影響
+//	ratio_1=magic.mnd_1.value / magic.mnd_2.value;
+//	ratio_2=magic.mnd_2.value / magic.mnd_1.value;
+	if (magic.mnd_1.value <= 0){
+		ratio_1=0;
+	} else if (magic.mnd_2.value <= 0) {
+		ratio_1=10000; // 隨便一個比 1.2 大的值
+	} else {
+		ratio_1=magic.mnd_1.value / magic.mnd_2.value;
+	}
+	if (magic.mnd_2.value <= 0){
+		ratio_2=0;
+	} else if (magic.mnd_1.value <= 0){
+		ratio_2=10000; // 隨便一個比 1.43 大的值
+	} else {
+		ratio_2=magic.mnd_2.value / magic.mnd_1.value;
+	}
+		if (ratio_1 >= 1.2)	return 1;
+		else if (ratio_1 >= 1.14)	return 0.91;
+		else if (ratio_1 >= 1.06)	return 0.82;
+		else if (ratio_2 >= 1.43)	return 0.09;
+		else if (ratio_2 >= 1.25)	return 0.27;
+		else if (ratio_2 >= 1.11)	return 0.36;
+		else if (ratio_2 >= 1.02)	return 0.55;
+		else return 0.64;
+}
+function normal_or_pk(){	// 一般打怪 or PK
+	if (magic.situation[1].checked)	return 1.2;
+	else	return 1;
+}
+function weapon_race(){		// 種族武器
+		switch (magic.race_3.value){
+		case "1":
+			switch (magic.race_2.value){
+				case "5":	return 0.2;
+				case "3":	return 0.1;
+				case "8":	return -0.15;
+				case "9":	return -0.2;
+				case "10":	return -0.2;
+				case "11":	return -0.2;
+				case "12":	return -0.2;
+				default :	return 0;
+			}
+		case "2":
+			switch (magic.race_2.value){
+				case "9":	return 0.2;
+				case "7":	return 0.1;
+				case "3":	return -0.15;
+				case "5":	return -0.2;
+				case "10":	return -0.2;
+				case "11":	return -0.2;
+				case "12":	return -0.2;
+				default :	return 0;
+			}
+		case "3":
+			switch (magic.race_2.value){
+				case "4":	return 0.2;
+				case "2":	return 0.1;
+				case "1":	return -0.15;
+				case "8":	return -0.2;
+				case "10":	return -0.2;
+				case "11":	return -0.2;
+				case "12":	return -0.2;
+				default :	return 0;
+			}
+		case "4":
+			switch (magic.race_2.value){
+				case "6":	return 0.2;
+				case "5":	return 0.1;
+				case "9":	return -0.15;
+				case "3":	return -0.2;
+				case "10":	return -0.2;
+				case "11":	return -0.2;
+				case "12":	return -0.2;
+				default :	return 0;
+			}
+		case "5":
+			switch (magic.race_2.value){
+				case "2":	return 0.2;
+				case "6":	return 0.1;
+				case "4":	return -0.15;
+				case "1":	return -0.2;
+				case "10":	return -0.2;
+				case "11":	return -0.2;
+				case "12":	return -0.2;
+				default :	return 0;
+			}
+		case "6":
+			switch (magic.race_2.value){
+				case "7":	return 0.2;
+				case "8":	return 0.1;
+				case "5":	return -0.15;
+				case "4":	return -0.2;
+				case "10":	return -0.2;
+				case "11":	return -0.2;
+				case "12":	return -0.2;
+				default :	return 0;
+			}
+		case "7":
+			switch (magic.race_2.value){
+				case "8":	return 0.2;
+				case "9":	return 0.1;
+				case "2":	return -0.15;
+				case "6":	return -0.2;
+				case "10":	return -0.2;
+				case "11":	return -0.2;
+				case "12":	return -0.2;
+				default :	return 0;
+			}
+		case "8":
+			switch (magic.race_2.value){
+				case "3":	return 0.2;
+				case "1":	return 0.1;
+				case "6":	return -0.15;
+				case "7":	return -0.2;
+				case "10":	return -0.2;
+				case "11":	return -0.2;
+				case "12":	return -0.2;
+				default :	return 0;
+			}
+		case "9":
+			switch (magic.race_2.value){
+				case "1":	return 0.2;
+				case "4":	return 0.1;
+				case "7":	return -0.15;
+				case "2":	return -0.2;
+				case "10":	return -0.2;
+				case "11":	return -0.2;
+				case "12":	return -0.2;
+				default :	return 0;
+			}
+		case "10":
+			switch (magic.race_2.value){
+				case "10":	return 0;
+				case "11":	return -0.15;
+				case "12":	return 0.05;
+				default :	return 0.1;
+			}
+		case "11":
+			switch (magic.race_2.value){
+				case "10":	return 0.05;
+				case "11":	return 0;
+				case "12":	return -0.15;
+				default :	return 0.1;
+			}
+		case "12":
+			switch (magic.race_2.value){
+				case "10":	return -0.15;
+				case "11":	return 0.05;
+				case "12":	return 0;
+				default :	return 0.1;
+			}
+		case "13":
+			return 0;
+	}
+}
+
+function Dydron_pet(){
+	result = Math.floor( fundamental_damage_pet() * mnd_ratio_pet() ) * 
+		 ( 1 + crystal_relation_pet() ) *
+		 ( 1 + element_relation_pet() + race_relation_pet()) *
+		 mnd_difference_pet();
+//	result = (magic.water_1.value>magic.fire_2.value)?magic.fire_2.value:magic.water_1.value;
+//	result = crystal_relation();
+	magic.damage95_pet.value = Math.floor(result * 0.95);
+	magic.damage96_pet.value = Math.floor(result * 0.96);
+	magic.damage97_pet.value = Math.floor(result * 0.97);
+	magic.damage98_pet.value = Math.floor(result * 0.98);
+	magic.damage99_pet.value = Math.floor(result * 0.99);
+	magic.damage100_pet.value = Math.floor(result);
+//	magic.damage100.value = result;
+	magic.damage101_pet.value = Math.floor(result * 1.01);
+	magic.damage102_pet.value = Math.floor(result * 1.02);
+	magic.damage103_pet.value = Math.floor(result * 1.03);
+	magic.damage104_pet.value = Math.floor(result * 1.04);
+	magic.damage105_pet.value = Math.floor(result * 1.05);
+
+//	magic.aaa_pet.value = fundamental_damage_pet();
+//	magic.bbb_pet.value = mnd_ratio_pet();
+//	magic.ccc_pet.value = crystal_relation_pet();
+//	magic.ddd_pet.value = element_relation_pet();
+//	magic.eee_pet.value = race_relation_pet();
+//	magic.fff_pet.value = mnd_difference_pet();
+
+}
+function fundamental_damage_pet(){ // 單強超法各級威力基本值
+	switch (magic.type_pet.value){
+	case "1":	// 單法
+		switch (magic.level_pet.value){
+		case "1":	return 119;
+		case "2":	return 215;
+		case "3":	return 302;
+		case "4":	return 382;
+		case "5":	return 464;
+		case "6":	return 547;
+		case "7":	return 629;
+		case "8":	return 720;
+		case "9":	return 816;
+		case "10":	return 1091;	
+//		case "11":	return 672;
+//		case "12":	return 737;
+//		case "13":	return 800;
+//		case "14":	return 827;
+//		case "15":	return 889;
+		}
+	case "2":	// 強法
+		switch (magic.level_pet.value){
+		case "1":	return  89;
+		case "2":	return 163;
+		case "3":	return 226;
+		case "4":	return 288;
+		case "5":	return 349;
+		case "6":	return 409;
+		case "7":	return 470;
+		case "8":	return 540;
+		case "9":	return 614;
+		case "10":	return 685;		
+//		case "11":	return 422;
+//		case "12":	return 463;
+//		case "13":	return 505;
+//		case "14":	return 547;
+//		case "15":	return 587;
+		}
+//	case "3":	// 超法
+//		switch (magic.level_pet.value){
+//		case "1":	return  33;
+//		case "2":	return  59;
+//		case "3":	return  84;
+//		case "4":	return 106;
+//		case "5":	return 129;
+//		case "6":	return 152;
+//		case "7":	return 175;
+//		case "8":	return 200;
+//		case "9":	return 227;
+//		case "10":	return 254;
+//		case "11":	return 281;
+//		case "12":	return 309;
+//		case "13":	return 337;
+//		case "14":	return 365;
+//		case "15":	return 391;
+//		}
+	}
+}
+function mnd_ratio_pet(){
+	mnd_upper_bound = 103 + magic.level_pet.value*20;
+	mnd_ratio_real = magic.mnd_1_pet.value / mnd_upper_bound;
+	if (mnd_ratio_real >= 1)	return 1;
+	else if (magic.mnd_1_pet.value <= 0) return 0;
+	else return mnd_ratio_real;
+}
+function crystal_relation_pet(){	// 水晶屬性
+	slot=0;
+	sum_1=(magic.ground_1_pet.value*1 + magic.water_1_pet.value*1 + magic.fire_1_pet.value*1 + magic.wind_1_pet.value*1) * 10;
+	sum_2=(magic.ground_2_pet.value*1 + magic.water_2_pet.value*1 + magic.fire_2_pet.value*1 + magic.wind_2_pet.value*1) * 10;
+
+	slot_1 = magic.ground_1_pet.value * magic.water_2_pet.value;
+	slot_2 = magic.water_1_pet.value * magic.fire_2_pet.value;
+	slot_3 = magic.fire_1_pet.value * magic.wind_2_pet.value;
+	slot_4 = magic.wind_1_pet.value * magic.ground_2_pet.value;
+	
+	slot_5 = magic.ground_2_pet.value * magic.water_1_pet.value;
+	slot_6 = magic.water_2_pet.value * magic.fire_1_pet.value;
+	slot_7 = magic.fire_2_pet.value * magic.wind_1_pet.value;
+	slot_8 = magic.wind_2_pet.value * magic.ground_1_pet.value;
+	slot = slot_1*1 + slot_2*1 + slot_3*1 + slot_4*1 - slot_5*1 - slot_6*1 - slot_7*1 - slot_8*1 + sum_1*1 - sum_2*1;
+	return slot*0.003;
+}
+function element_relation_pet(){	// 法術屬性
+	section=0;
+	switch (magic.element_pet.value){
+	case "1": // 地
+		section = section + magic.water_2_pet.value;
+		section = section - magic.wind_2_pet.value;
+		break;
+	case "2": // 水
+		section = section + magic.fire_2_pet.value;
+		section = section - magic.ground_2_pet.value;
+		break;
+	case "3": // 火
+		section = section + magic.wind_2_pet.value;
+		section = section - magic.water_2_pet.value;
+		break;
+	case "4": // 風
+		section = section + magic.ground_2_pet.value;
+		section = section - magic.fire_2_pet.value;
+		break;
+	}
+	section = section + 10 - ( magic.ground_2_pet.value*1 + magic.water_2_pet.value*1 + magic.fire_2_pet.value*1 + magic.wind_2_pet.value*1 );
+	return section*0.035;
+}
+function race_relation_pet(){	// 種族相剋循環
+		switch (magic.race_1_pet.value){
+		case "1":
+			switch (magic.race_2_pet.value){
+				case "5":	return 0.2;
+				case "3":	return 0.1;
+				case "8":	return -0.15;
+				case "9":	return -0.2;
+				case "10":	return -0.2;
+				case "11":	return -0.2;
+				case "12":	return -0.2;
+				default :	return 0;
+			}
+		case "2":
+			switch (magic.race_2_pet.value){
+				case "9":	return 0.2;
+				case "7":	return 0.1;
+				case "3":	return -0.15;
+				case "5":	return -0.2;
+				case "10":	return -0.2;
+				case "11":	return -0.2;
+				case "12":	return -0.2;
+				default :	return 0;
+			}
+		case "3":
+			switch (magic.race_2_pet.value){
+				case "4":	return 0.2;
+				case "2":	return 0.1;
+				case "1":	return -0.15;
+				case "8":	return -0.2;
+				case "10":	return -0.2;
+				case "11":	return -0.2;
+				case "12":	return -0.2;
+				default :	return 0;
+			}
+		case "4":
+			switch (magic.race_2_pet.value){
+				case "6":	return 0.2;
+				case "5":	return 0.1;
+				case "9":	return -0.15;
+				case "3":	return -0.2;
+				case "10":	return -0.2;
+				case "11":	return -0.2;
+				case "12":	return -0.2;
+				default :	return 0;
+			}
+		case "5":
+			switch (magic.race_2_pet.value){
+				case "2":	return 0.2;
+				case "6":	return 0.1;
+				case "4":	return -0.15;
+				case "1":	return -0.2;
+				case "10":	return -0.2;
+				case "11":	return -0.2;
+				case "12":	return -0.2;
+				default :	return 0;
+			}
+		case "6":
+			switch (magic.race_2_pet.value){
+				case "7":	return 0.2;
+				case "8":	return 0.1;
+				case "5":	return -0.15;
+				case "4":	return -0.2;
+				case "10":	return -0.2;
+				case "11":	return -0.2;
+				case "12":	return -0.2;
+				default :	return 0;
+			}
+		case "7":
+			switch (magic.race_2_pet.value){
+				case "8":	return 0.2;
+				case "9":	return 0.1;
+				case "2":	return -0.15;
+				case "6":	return -0.2;
+				case "10":	return -0.2;
+				case "11":	return -0.2;
+				case "12":	return -0.2;
+				default :	return 0;
+			}
+		case "8":
+			switch (magic.race_2_pet.value){
+				case "3":	return 0.2;
+				case "1":	return 0.1;
+				case "6":	return -0.15;
+				case "7":	return -0.2;
+				case "10":	return -0.2;
+				case "11":	return -0.2;
+				case "12":	return -0.2;
+				default :	return 0;
+			}
+		case "9":
+			switch (magic.race_2_pet.value){
+				case "1":	return 0.2;
+				case "4":	return 0.1;
+				case "7":	return -0.15;
+				case "2":	return -0.2;
+				case "10":	return -0.2;
+				case "11":	return -0.2;
+				case "12":	return -0.2;
+				default :	return 0;
+			}
+		case "10":
+			switch (magic.race_2_pet.value){
+				case "10":	return 0;
+				case "11":	return -0.15;
+				case "12":	return 0.05;
+				default :	return 0.1;
+			}
+		case "11":
+			switch (magic.race_2_pet.value){
+				case "10":	return 0.05;
+				case "11":	return 0;
+				case "12":	return -0.15;
+				default :	return 0.1;
+			}
+		case "12":
+			switch (magic.race_2_pet.value){
+				case "10":	return -0.15;
+				case "11":	return 0.05;
+				case "12":	return 0;
+				default :	return 0.1;
+			}
+		}
+}
+function mnd_difference_pet(){	// 施法方與受法方精神比影響
+//	ratio_1=magic.mnd_1_pet.value / magic.mnd_2_pet.value;
+//	ratio_2=magic.mnd_2_pet.value / magic.mnd_1_pet.value;
+	if (magic.mnd_1_pet.value <= 0){
+		ratio_1=0;
+	} else if (magic.mnd_2_pet.value <= 0) {
+		ratio_1=10000; // 隨便一個比 1.2 大的值
+	} else {
+		ratio_1=magic.mnd_1_pet.value / magic.mnd_2_pet.value;
+	}
+	if (magic.mnd_2_pet.value <= 0){
+		ratio_2=0;
+	} else if (magic.mnd_1_pet.value <= 0){
+		ratio_2=10000; // 隨便一個比 1.43 大的值
+	} else {
+		ratio_2=magic.mnd_2_pet.value / magic.mnd_1_pet.value;
+	}
+		if (ratio_1 >= 1.06)	return 1;
+		else if (ratio_2 >= 1.43)	return 0.36;
+		else if (ratio_2 >= 1.25)	return 0.55;
+		else if (ratio_2 >= 1.11)	return 0.64;
+		else if (ratio_2 >= 1.02)	return 0.82;
+		else return 0.91;
+}
+
+</script>
+<center>
+<form name="magic">
+<table cellspacing="1" border="2">
+<tbody>
+<tr><td colspan="2"><center><font color="red"><b>
+網頁寫成者 : RayLin / Dydron, 參考資料 : 巴哈精華區 gradyfx 及 Wraith 的文章<br>
+Lv11~Lv15 法術基礎傷害根據<a href="http://forum.gamer.com.tw/C.php?bsn=02577&amp;snA=156785&amp;tnum=1" target="_blank"> zyxvaaaa(~小月鈴~) 文章</a><br>
+</b></font></center></td></tr>
+<tr><td colspan="2"><center>
+人物魔法傷害部份
+</center></td></tr>
+<tr><td rowspan="2">
+施法方<br>
+1. 法術範圍 <select name="type">
+	<option value="1">單	</option><option value="2">強	</option><option value="3" selected="selected">超
+</option></select><br>
+2. 法術等級 <select name="level">
+	<option value="1">1	</option><option value="2">2	</option><option value="3">3	</option><option value="4">4
+	</option><option value="5">5	</option><option value="6">6	</option><option value="7">7	</option><option value="8">8
+	</option><option value="9">9	</option><option value="10">10	</option><option value="11">11	</option><option value="12">12
+	</option><option value="13">13	</option><option value="14">14	</option><option value="15" selected="selected">15
+</option></select><br>
+3. 法術屬性 <select name="element">
+	<option value="1">地	</option><option value="2">水	</option><option value="3" selected="selected">火	</option><option value="4">風
+</option></select><br>
+4. 水晶 
+地 <select name="ground_1">
+	<option value="0" selected="selected">0	</option><option value="1">1	</option><option value="2">2	</option><option value="3">3
+	</option><option value="4">4	</option><option value="5">5	</option><option value="6">6	</option><option value="7">7
+	</option><option value="8">8	</option><option value="9">9	</option><option value="10">10
+</option></select>
+水 <select name="water_1">
+	<option value="0" selected="selected">0	</option><option value="1">1	</option><option value="2">2	</option><option value="3">3
+	</option><option value="4">4	</option><option value="5">5	</option><option value="6">6	</option><option value="7">7
+	</option><option value="8">8	</option><option value="9">9	</option><option value="10">10
+</option></select>
+火 <select name="fire_1">
+	<option value="0">0	</option><option value="1">1	</option><option value="2">2	</option><option value="3">3
+	</option><option value="4">4	</option><option value="5">5	</option><option value="6">6	</option><option value="7">7
+	</option><option value="8">8	</option><option value="9">9	</option><option value="10" selected="selected">10
+</option></select>
+風 <select name="wind_1">
+	<option value="0">0	</option><option value="1">1	</option><option value="2">2	</option><option value="3">3
+	</option><option value="4">4	</option><option value="5">5	</option><option value="6">6	</option><option value="7">7
+	</option><option value="8">8	</option><option value="9">9	</option><option value="10" selected="selected">10
+</option></select><br>
+5. 精神 <input name="mnd_1" value="403" size="3"><br>
+6. 武器種族 <select name="race_3">
+	<option value="1">野獸	</option><option value="2">不死	</option><option value="3">飛行	</option><option value="4">昆蟲
+	</option><option value="5">植物	</option><option value="6">特殊	</option><option value="7" selected="selected">金屬	</option><option value="8">龍
+	</option><option value="9">人形	</option><option value="10">邪魔 </option><option value="11">神族 </option><option value="12">精靈
+  </option><option value="13">無</option></select><br>
+7. 魔攻 <input name="adm" value="320" size="3"><br>
+</td><td>
+受法方<br>
+1. 水晶 
+地 <select name="ground_2">
+	<option value="0" selected="selected">0	</option><option value="1">1	</option><option value="2">2	</option><option value="3">3
+	</option><option value="4">4	</option><option value="5">5	</option><option value="6">6	</option><option value="7">7
+	</option><option value="8">8	</option><option value="9">9	</option><option value="10">10
+</option></select>
+水 <select name="water_2">
+	<option value="0" selected="selected">0	</option><option value="1">1	</option><option value="2">2	</option><option value="3">3
+	</option><option value="4">4	</option><option value="5">5	</option><option value="6">6	</option><option value="7">7
+	</option><option value="8">8	</option><option value="9">9	</option><option value="10">10
+</option></select>
+火 <select name="fire_2">
+	<option value="0" selected="selected">0	</option><option value="1">1	</option><option value="2">2	</option><option value="3">3
+	</option><option value="4">4	</option><option value="5">5	</option><option value="6">6	</option><option value="7">7
+	</option><option value="8">8	</option><option value="9">9	</option><option value="10">10
+</option></select>
+風 <select name="wind_2">
+	<option value="0">0	</option><option value="1">1	</option><option value="2">2	</option><option value="3">3
+	</option><option value="4">4	</option><option value="5">5	</option><option value="6">6	</option><option value="7">7
+	</option><option value="8">8	</option><option value="9">9	</option><option value="10" selected="selected">10
+</option></select><br>
+2. 種族 <select name="race_2">
+	<option value="1">野獸	</option><option value="2">不死	</option><option value="3">飛行	</option><option value="4">昆蟲
+	</option><option value="5">植物	</option><option value="6">特殊	</option><option value="7">金屬	</option><option value="8" selected="selected">龍
+	</option><option value="9">人形	</option><option value="10">邪魔 </option><option value="11">神族</option><option value="12">精靈
+</option></select><br>
+3. 精神 <input name="mnd_2" value="100" size="3"><br>
+</td></tr><tr><td>
+<input name="situation" value="pk" type="radio">PK中 <br>
+<input name="situation" value="normal" checked="checked" type="radio">一般打怪 <br>
+</td></tr><tr><td colspan="2">
+<center>
+<input onclick="Dydron()" value="計算人物魔法傷害" name="calculate" type="button">
+</center>
+</td></tr><tr><td colspan="2">
+<center>
+<input size="4" name="damage95">  <input size="4" name="damage96">  <input size="4" name="damage97">  
+<input size="4" name="damage98">  <input size="4" name="damage99">  <br>
+<input size="4" name="damage100">  <br>
+<input size="4" name="damage101">  <input size="4" name="damage102">  <input size="4" name="damage103">  
+<input size="4" name="damage104">  <input size="4" name="damage105">  
+</center>
+</td></tr>
+<tr><td colspan="2"><center>
+寵物魔法傷害部份
+</center></td></tr>
+<tr><td rowspan="2">
+施法方<br>
+1. 法術範圍 <select name="type_pet">
+	<option value="1" selected="selected">單	</option><option value="2">強
+</option></select><br>
+2. 法術等級 <select name="level_pet">
+	<option value="1">1	</option><option value="2">2	</option><option value="3">3	</option><option value="4">4
+	</option><option value="5">5	</option><option value="6">6	</option><option value="7">7	</option><option value="8">8
+	</option><option value="9">9	</option><option value="10" selected="selected">10
+</option></select><br>
+3. 法術屬性 <select name="element_pet">
+	<option value="1">地	</option><option value="2" selected="selected">水	</option><option value="3">火	</option><option value="4">風
+</option></select><br>
+4. 水晶 
+地 <select name="ground_1_pet">
+	<option value="0" selected="selected">0	</option><option value="1">1	</option><option value="2">2	</option><option value="3">3
+	</option><option value="4">4	</option><option value="5">5	</option><option value="6">6	</option><option value="7">7
+	</option><option value="8">8	</option><option value="9">9	</option><option value="10">10
+</option></select>
+水 <select name="water_1_pet">
+	<option value="0">0	</option><option value="1">1	</option><option value="2">2	</option><option value="3">3
+	</option><option value="4">4	</option><option value="5">5	</option><option value="6">6	</option><option value="7">7
+	</option><option value="8">8	</option><option value="9">9	</option><option value="10" selected="selected">10
+</option></select>
+火 <select name="fire_1_pet">
+	<option value="0" selected="selected">0	</option><option value="1">1	</option><option value="2">2	</option><option value="3">3
+	</option><option value="4">4	</option><option value="5">5	</option><option value="6">6	</option><option value="7">7
+	</option><option value="8">8	</option><option value="9">9	</option><option value="10">10
+</option></select>
+風 <select name="wind_1_pet">
+	<option value="0" selected="selected">0	</option><option value="1">1	</option><option value="2">2	</option><option value="3">3
+	</option><option value="4">4	</option><option value="5">5	</option><option value="6">6	</option><option value="7">7
+	</option><option value="8">8	</option><option value="9">9	</option><option value="10">10
+</option></select><br>
+5. 種族 <select name="race_1_pet">
+	<option value="1">野獸	</option><option value="2">不死	</option><option value="3">飛行	</option><option value="4">昆蟲
+	</option><option value="5">植物	</option><option value="6">特殊	</option><option value="7">金屬	</option><option value="8">龍
+	</option><option value="9">人形	</option><option value="10">邪魔 </option><option value="11" selected="selected">神族
+	</option><option value="12">精靈</option></select><br>
+6. 精神 <input name="mnd_1_pet" value="303" size="3"><br>
+</td><td>
+受法方<br>
+1. 水晶 
+地 <select name="ground_2_pet">
+	<option value="0" selected="selected">0	</option><option value="1">1	</option><option value="2">2	</option><option value="3">3
+	</option><option value="4">4	</option><option value="5">5	</option><option value="6">6	</option><option value="7">7
+	</option><option value="8">8	</option><option value="9">9	</option><option value="10">10
+</option></select>
+水 <select name="water_2_pet">
+	<option value="0">0	</option><option value="1">1	</option><option value="2">2	</option><option value="3">3
+	</option><option value="4">4	</option><option value="5">5	</option><option value="6">6	</option><option value="7">7
+	</option><option value="8">8	</option><option value="9">9	</option><option value="10" selected="selected">10
+</option></select>
+火 <select name="fire_2_pet">
+	<option value="0" selected="selected">0	</option><option value="1">1	</option><option value="2">2	</option><option value="3">3
+	</option><option value="4">4	</option><option value="5">5	</option><option value="6">6	</option><option value="7">7
+	</option><option value="8">8	</option><option value="9">9	</option><option value="10">10
+</option></select>
+風 <select name="wind_2_pet">
+	<option value="0" selected="selected">0	</option><option value="1">1	</option><option value="2">2	</option><option value="3">3
+	</option><option value="4">4	</option><option value="5">5	</option><option value="6">6	</option><option value="7">7
+	</option><option value="8">8	</option><option value="9">9	</option><option value="10">10
+</option></select><br>
+2. 種族 <select name="race_2_pet">
+	<option value="1">野獸	</option><option value="2">不死	</option><option value="3">飛行	</option><option value="4">昆蟲
+	</option><option value="5">植物	</option><option value="6">特殊	</option><option value="7">金屬	</option><option value="8">龍
+	</option><option value="9" selected="selected">人形	</option><option value="10">邪魔 </option><option value="11">神族</option><option value="12">精靈</option></select><br>
+3. 精神 <input name="mnd_2_pet" value="100" size="3"><br>
+</td></tr><tr><td>
+</td></tr><tr><td colspan="2">
+<center>
+<input onclick="Dydron_pet()" value="計算寵物魔法傷害" name="calculate_pet" type="button">
+</center>
+</td></tr><tr><td colspan="2">
+<center>
+<input size="4" name="damage95_pet">  <input size="4" name="damage96_pet">  <input size="4" name="damage97_pet">  
+<input size="4" name="damage98_pet">  <input size="4" name="damage99_pet">  <br>
+<input size="4" name="damage100_pet">  <br>
+<input size="4" name="damage101_pet">  <input size="4" name="damage102_pet">  <input size="4" name="damage103_pet">  
+<input size="4" name="damage104_pet">  <input size="4" name="damage105_pet">  <br>
+</center>
+</td></tr>
+<tr><td colspan="2"><center>
+尚欠 吸血魔法, RSS 魔防, 種族防具
+</center></td></tr>
+</tbody>
+</table>
+<!---<hr><center>
+<input size=4 name=aaa>
+<input size=4 name=bbb>
+<input size=4 name=ccc>
+<input size=4 name=ddd>
+<input size=4 name=eee>
+<input size=4 name=fff>
+<input size=4 name=ggg>
+<input size=4 name=hhh>
+<input size=4 name=iii>
+<input size=4 name=jjj>
+<input size=4 name=kkk>
+</center>-->
+<!---<hr><center>
+<input size=4 name=aaa_pet>
+<input size=4 name=bbb_pet>
+<input size=4 name=ccc_pet>
+<input size=4 name=ddd_pet>
+<input size=4 name=eee_pet>
+<input size=4 name=fff_pet>
+</center>-->
+</form>
+</center>
+
+
+</body></html>
